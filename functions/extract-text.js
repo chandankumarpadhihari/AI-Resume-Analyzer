@@ -29,18 +29,31 @@ exports.handler = async function(event, context) {
     // Handle different file types
     if (file.type === 'application/pdf') {
       try {
-        // For PDF files
         console.log('Processing PDF file...');
+        console.log('File size:', file.data.length);
+        
+        // Load the PDF document
         const pdfDoc = await PDFDocument.load(file.data);
+        console.log('PDF loaded successfully');
+        
         const pages = pdfDoc.getPages();
         console.log(`Found ${pages.length} pages in PDF`);
         
+        if (pages.length === 0) {
+          throw new Error('PDF contains no pages');
+        }
+
+        // Try to extract text from each page
         for (let i = 0; i < pages.length; i++) {
           try {
             const page = pages[i];
             const pageText = await page.getText();
-            if (pageText) {
-              text += pageText + '\n';
+            console.log(`Page ${i + 1} text length:`, pageText.length);
+            
+            if (pageText && pageText.trim()) {
+              text += pageText.trim() + '\n\n';
+            } else {
+              console.log(`No text found on page ${i + 1}`);
             }
           } catch (pageError) {
             console.error(`Error processing page ${i + 1}:`, pageError);
@@ -49,19 +62,24 @@ exports.handler = async function(event, context) {
         }
         
         if (!text.trim()) {
-          throw new Error('No text content could be extracted from PDF');
+          console.log('No text content could be extracted from any page');
+          throw new Error('No text content could be extracted from PDF. The PDF might be scanned or contain only images.');
         }
+
+        console.log('Successfully extracted text from PDF');
       } catch (error) {
         console.error('PDF processing error:', error);
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Failed to process PDF file: ' + error.message })
+          body: JSON.stringify({ 
+            error: 'Failed to process PDF file: ' + error.message,
+            details: 'The PDF might be scanned, contain only images, or be password protected.'
+          })
         };
       }
     } else if (file.type === 'application/msword' || 
                file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       try {
-        // For DOC/DOCX files
         const result = await mammoth.extractRawText({ buffer: file.data });
         text = result.value;
       } catch (error) {
@@ -72,7 +90,6 @@ exports.handler = async function(event, context) {
         };
       }
     } else if (file.type === 'text/plain') {
-      // For text files
       text = file.data.toString();
     } else {
       return {
