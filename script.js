@@ -35,41 +35,38 @@ resumeFile.addEventListener('change', async (e) => {
         const text = await file.text();
         resumeTextarea.value = text;
       } 
-      // For PDF files, we'll need to handle them on the server side
-      else if (file.type === 'application/pdf') {
-        // We'll send the file to the server for processing
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await fetch('/.netlify/functions/extract-text', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          resumeTextarea.value = data.text;
-        } else {
-          throw new Error('Failed to extract text from PDF');
-        }
-      }
-      // For DOC/DOCX files, similar to PDF
-      else if (file.type === 'application/msword' || 
+      // For PDF and DOC files, send to server for processing
+      else if (file.type === 'application/pdf' || 
+               file.type === 'application/msword' || 
                file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        
+        // Show loading state
+        fileName.textContent = 'Processing file...';
+        
+        // Create FormData and append file
         const formData = new FormData();
         formData.append('file', file);
         
+        // Send file to server
         const response = await fetch('/.netlify/functions/extract-text', {
           method: 'POST',
           body: formData
         });
         
-        if (response.ok) {
-          const data = await response.json();
-          resumeTextarea.value = data.text;
-        } else {
-          throw new Error('Failed to extract text from document');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to process file');
         }
+        
+        const data = await response.json();
+        if (data.text) {
+          resumeTextarea.value = data.text;
+          fileName.textContent = file.name;
+        } else {
+          throw new Error('No text content received from server');
+        }
+      } else {
+        throw new Error('Unsupported file type. Please upload a PDF, DOC, DOCX, or TXT file.');
       }
     } catch (error) {
       console.error('Error processing file:', error);
