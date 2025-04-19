@@ -1,14 +1,16 @@
 {
   "name": "ai-resume-analyzer",
   "version": "1.0.0",
-  "description": "AI Resume Analyzer with file upload and analysis capabilities",
-  "private": true,
+  "description": "AI-powered resume analyzer",
+  "main": "index.js",
   "scripts": {
     "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "openai": "^4.0.0",
     "pdf-lib": "^1.17.1",
-    "mammoth": "^1.6.0"
-  }
+    "mammoth": "^1.6.0",
+    "parse-multipart": "^1.0.4"
+  },
+  "author": "",
+  "license": "ISC"
 } 

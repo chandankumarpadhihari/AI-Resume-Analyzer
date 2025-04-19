@@ -1,6 +1,7 @@
 const { PDFDocument } = require('pdf-lib');
 const mammoth = require('mammoth');
 const { Readable } = require('stream');
+const multipart = require('parse-multipart');
 
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'POST') {
@@ -12,9 +13,10 @@ exports.handler = async function(event, context) {
 
   try {
     // Parse the multipart form data
-    const formData = event.body;
-    const file = formData.file;
-    
+    const boundary = event.headers['content-type'].split('=')[1];
+    const parts = multipart.Parse(Buffer.from(event.body, 'base64'), boundary);
+    const file = parts[0];
+
     if (!file) {
       return {
         statusCode: 400,
@@ -28,7 +30,7 @@ exports.handler = async function(event, context) {
     if (file.type === 'application/pdf') {
       try {
         // For PDF files
-        const pdfDoc = await PDFDocument.load(file.buffer);
+        const pdfDoc = await PDFDocument.load(file.data);
         const pages = pdfDoc.getPages();
         for (const page of pages) {
           text += await page.getText();
@@ -44,8 +46,7 @@ exports.handler = async function(event, context) {
                file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       try {
         // For DOC/DOCX files
-        const buffer = Buffer.from(file.buffer);
-        const result = await mammoth.extractRawText({ buffer });
+        const result = await mammoth.extractRawText({ buffer: file.data });
         text = result.value;
       } catch (error) {
         console.error('DOC processing error:', error);
@@ -56,7 +57,7 @@ exports.handler = async function(event, context) {
       }
     } else if (file.type === 'text/plain') {
       // For text files
-      text = file.buffer.toString();
+      text = file.data.toString();
     } else {
       return {
         statusCode: 400,
