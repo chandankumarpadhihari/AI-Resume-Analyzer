@@ -63,7 +63,7 @@ exports.handler = async function(event, context) {
         
         if (!text.trim()) {
           console.log('No text content could be extracted from any page');
-          throw new Error('No text content could be extracted from PDF. The PDF might be scanned or contain only images.');
+          throw new Error('No text content could be extracted from PDF. Please try uploading a Word document (DOC or DOCX) instead, or paste your resume text directly.');
         }
 
         console.log('Successfully extracted text from PDF');
@@ -72,8 +72,8 @@ exports.handler = async function(event, context) {
         return {
           statusCode: 400,
           body: JSON.stringify({ 
-            error: 'Failed to process PDF file: ' + error.message,
-            details: 'The PDF might be scanned, contain only images, or be password protected.'
+            error: 'Failed to process PDF file. ' + error.message,
+            suggestion: 'Please try uploading a Word document (DOC or DOCX) instead, or paste your resume text directly. Word documents usually provide better text extraction results.'
           })
         };
       }
@@ -94,14 +94,20 @@ exports.handler = async function(event, context) {
     } else {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Unsupported file type' })
+        body: JSON.stringify({ 
+          error: 'Unsupported file type',
+          suggestion: 'Please upload a Word document (DOC or DOCX), PDF, or text file.'
+        })
       };
     }
 
     if (!text.trim()) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'No text content found in file' })
+        body: JSON.stringify({ 
+          error: 'No text content found in file',
+          suggestion: 'Please try uploading a different file or paste your resume text directly.'
+        })
       };
     }
 
