@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Analyzer</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="main-card">
+    <div class="text-center mb-8">
+      <h1 class="title">AI Resume Analyzer</h1>
+      <p class="subtitle">Get instant feedback on your resume's fit for any job</p>
+    </div>
+
+    <div class="space-y-6">
+      <div class="form-section">
+        <label class="form-label">
+          <i class="fas fa-file-alt"></i>
+          Your Resume or LinkedIn Bio
+        </label>
+        <textarea 
+          id="resume" 
+          class="form-textarea" 
+          placeholder="Paste your resume here..."
+        ></textarea>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">
+          <i class="fas fa-briefcase"></i>
+          Job Description
+        </label>
+        <textarea 
+          id="job" 
+          class="form-textarea" 
+          placeholder="Paste the job description here..."
+        ></textarea>
+      </div>
+
+      <button 
+        onclick="analyze()" 
+        id="analyzeBtn"
+        class="analyze-button"
+      >
+        <span id="buttonText">Analyze Fit</span>
+        <span id="loadingSpinner" class="loading hidden"></span>
+      </button>
+
+      <div id="result" class="results hidden"></div>
+    </div>
+  </div>
+
+  <script>
+    // Theme functionality
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      updateThemeIcon(theme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.querySelector('.theme-toggle i');
+      icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+
+    async function analyze() {
+      const resumeText = document.getElementById('resume').value;
+      const job = document.getElementById('job').value;
+      const resultBox = document.getElementById('result');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const buttonText = document.getElementById('buttonText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
+      // Validate inputs
+      if (!resumeText) {
+        alert('Please enter your resume text');
+        return;
+      }
+      if (!job) {
+        alert('Please enter the job description');
+        return;
+      }
+
+      // Show loading state
+      analyzeBtn.disabled = true;
+      buttonText.textContent = 'Analyzing...';
+      loadingSpinner.classList.remove('hidden');
+      resultBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/.netlify/functions/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume: resumeText, job })
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Error analyzing resume');
+        }
+
+        const data = await res.json();
+        resultBox.textContent = data.analysis;
+        resultBox.classList.remove('hidden');
+      } catch (err) {
+        console.error('Error during analysis:', err);
+        resultBox.textContent = `Error: ${err.message}. Please try again later or contact support if the problem persists.`;
+        resultBox.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        analyzeBtn.disabled = false;
+        buttonText.textContent = 'Analyze Fit';
+        loadingSpinner.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
