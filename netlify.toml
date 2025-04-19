@@ -1,6 +1,13 @@
 [build]
+  command = "npm install && npm run build"
   functions = "functions"
   publish = "."
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
+[functions]
+  node_bundler = "esbuild"
 
 [build.environment]
   NODE_VERSION = "18"
