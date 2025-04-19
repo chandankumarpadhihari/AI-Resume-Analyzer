@@ -346,4 +346,60 @@ body {
     font-size: 1rem;
     padding: 0.75rem;
   }
+}
+
+/* File upload styles */
+.file-upload-container {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.file-upload-label:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.file-upload-label i {
+  margin-right: 0.5rem;
+}
+
+.file-name {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.or-divider span {
+  padding: 0 1rem;
 } 
