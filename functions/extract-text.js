@@ -30,16 +30,32 @@ exports.handler = async function(event, context) {
     if (file.type === 'application/pdf') {
       try {
         // For PDF files
+        console.log('Processing PDF file...');
         const pdfDoc = await PDFDocument.load(file.data);
         const pages = pdfDoc.getPages();
-        for (const page of pages) {
-          text += await page.getText();
+        console.log(`Found ${pages.length} pages in PDF`);
+        
+        for (let i = 0; i < pages.length; i++) {
+          try {
+            const page = pages[i];
+            const pageText = await page.getText();
+            if (pageText) {
+              text += pageText + '\n';
+            }
+          } catch (pageError) {
+            console.error(`Error processing page ${i + 1}:`, pageError);
+            // Continue with next page even if one fails
+          }
+        }
+        
+        if (!text.trim()) {
+          throw new Error('No text content could be extracted from PDF');
         }
       } catch (error) {
         console.error('PDF processing error:', error);
         return {
           statusCode: 400,
-          body: JSON.stringify({ error: 'Failed to process PDF file' })
+          body: JSON.stringify({ error: 'Failed to process PDF file: ' + error.message })
         };
       }
     } else if (file.type === 'application/msword' || 
