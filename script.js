@@ -20,6 +20,16 @@ function toggleTheme() {
 const resumeFile = document.getElementById('resumeFile');
 const fileName = document.getElementById('fileName');
 const resumeTextarea = document.getElementById('resume');
+const fileUploadContainer = document.querySelector('.file-upload-container');
+
+// Add suggestion message
+const suggestionMessage = document.createElement('div');
+suggestionMessage.className = 'file-suggestion';
+suggestionMessage.innerHTML = `
+  <p><i class="fas fa-info-circle"></i> For best results, please upload a Word document (DOC or DOCX). 
+  PDF files may not work correctly if they contain images or are scanned.</p>
+`;
+fileUploadContainer.insertBefore(suggestionMessage, resumeFile);
 
 resumeFile.addEventListener('change', async (e) => {
   const file = e.target.files[0];
@@ -54,7 +64,7 @@ resumeFile.addEventListener('change', async (e) => {
         });
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
+          const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to process file');
         }
         

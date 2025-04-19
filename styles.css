@@ -362,4 +362,25 @@ body {
 
 .or-divider span {
   padding: 0 1rem;
+}
+
+/* File upload suggestion */
+.file-suggestion {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.file-suggestion i {
+  color: var(--primary-color);
+  margin-right: 0.5rem;
+}
+
+[data-theme="dark"] .file-suggestion {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
 } 
