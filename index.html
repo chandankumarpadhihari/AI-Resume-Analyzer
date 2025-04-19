@@ -23,12 +23,28 @@
       <div class="form-section">
         <label class="form-label">
           <i class="fas fa-file-alt"></i>
-          Your Resume or LinkedIn Bio
+          Your Resume
         </label>
+        <div class="file-upload-container">
+          <input 
+            type="file" 
+            id="resumeFile" 
+            accept=".pdf,.doc,.docx,.txt"
+            class="file-input"
+          />
+          <label for="resumeFile" class="file-upload-label">
+            <i class="fas fa-upload"></i>
+            Choose File
+          </label>
+          <span class="file-name" id="fileName">No file chosen</span>
+        </div>
+        <div class="or-divider">
+          <span>OR</span>
+        </div>
         <textarea 
           id="resume" 
           class="form-textarea" 
-          placeholder="Paste your resume here..."
+          placeholder="Paste your resume text here..."
         ></textarea>
       </div>
 
@@ -57,79 +73,6 @@
     </div>
   </div>
 
-  <script>
-    // Theme functionality
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-      updateThemeIcon(theme);
-    }
-
-    function updateThemeIcon(theme) {
-      const icon = document.querySelector('.theme-toggle i');
-      icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    }
-
-    function toggleTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      setTheme(newTheme);
-    }
-
-    // Initialize theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-
-    async function analyze() {
-      const resumeText = document.getElementById('resume').value;
-      const job = document.getElementById('job').value;
-      const resultBox = document.getElementById('result');
-      const analyzeBtn = document.getElementById('analyzeBtn');
-      const buttonText = document.getElementById('buttonText');
-      const loadingSpinner = document.getElementById('loadingSpinner');
-
-      // Validate inputs
-      if (!resumeText) {
-        alert('Please enter your resume text');
-        return;
-      }
-      if (!job) {
-        alert('Please enter the job description');
-        return;
-      }
-
-      // Show loading state
-      analyzeBtn.disabled = true;
-      buttonText.textContent = 'Analyzing...';
-      loadingSpinner.classList.remove('hidden');
-      resultBox.classList.add('hidden');
-
-      try {
-        const res = await fetch('/.netlify/functions/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resume: resumeText, job })
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.error || 'Error analyzing resume');
-        }
-
-        const data = await res.json();
-        resultBox.textContent = data.analysis;
-        resultBox.classList.remove('hidden');
-      } catch (err) {
-        console.error('Error during analysis:', err);
-        resultBox.textContent = `Error: ${err.message}. Please try again later or contact support if the problem persists.`;
-        resultBox.classList.remove('hidden');
-      } finally {
-        // Reset button state
-        analyzeBtn.disabled = false;
-        buttonText.textContent = 'Analyze Fit';
-        loadingSpinner.classList.add('hidden');
-      }
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
