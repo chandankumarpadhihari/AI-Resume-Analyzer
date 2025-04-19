@@ -10,6 +10,8 @@
   --bg-secondary: #f9fafb;
   --border-color: #e5e7eb;
   --shadow-color: rgba(0, 0, 0, 0.1);
+  --card-bg: #ffffff;
+  --text-color: #1f2937;
 }
 
 [data-theme="dark"] {
@@ -23,6 +25,8 @@
   --bg-secondary: #111827;
   --border-color: #374151;
   --shadow-color: rgba(0, 0, 0, 0.3);
+  --card-bg: #1f2937;
+  --text-color: #f3f4f6;
 }
 
 body {
@@ -33,6 +37,7 @@ body {
   justify-content: center;
   padding: 1rem;
   transition: background 0.3s ease;
+  margin: 0;
 }
 
 [data-theme="dark"] body {
@@ -44,39 +49,39 @@ body {
   position: fixed;
   top: 1rem;
   right: 1rem;
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+  padding: 0.5rem;
   border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px var(--shadow-color);
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
 }
 
 .theme-toggle i {
-  font-size: 1.25rem;
-  color: var(--text-primary);
+  font-size: 1.2rem;
+  color: var(--text-color);
 }
 
 /* Card styles */
 .main-card {
-  background: var(--bg-primary);
-  box-shadow: 0 25px 50px -12px var(--shadow-color);
-  border-radius: 1.5rem;
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 2rem;
+  max-width: 800px;
   width: 100%;
-  max-width: 56rem;
-  transition: all 0.3s ease;
+  margin: 2rem auto;
   position: relative;
-  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-card::before {
@@ -303,15 +308,33 @@ body {
   }
 }
 
-/* Responsive Design */
+/* Responsive adjustments */
 @media (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+
   .main-card {
+    margin: 0;
     padding: 1.5rem;
-    margin: 1rem;
+    border-radius: 0;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+
+  .theme-toggle {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 36px;
+    height: 36px;
+  }
+
+  .theme-toggle i {
+    font-size: 1rem;
   }
 
   .title {
-    font-size: 1.875rem;
+    font-size: 1.5rem;
   }
 
   .form-section {
@@ -320,11 +343,6 @@ body {
 
   .form-textarea {
     height: 8rem;
-  }
-
-  .theme-toggle {
-    width: 2.5rem;
-    height: 2.5rem;
   }
 }
 
